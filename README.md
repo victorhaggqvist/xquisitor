@@ -1,7 +1,7 @@
 XQuisitor2
 =========
 
-XQuisitor2 is based of [XQuisitor](http://www.cafeconleche.org/xquisitor/) and extended to satisfaction.
+XQuisitor2 is based of [XQuisitor](http://www.cafeconleche.org/xquisitor/) and extended
 
 #Download
 
