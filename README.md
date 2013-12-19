@@ -17,7 +17,6 @@ Get current version [here](https://github.com/victorhaggqvist/xquisitor/archive/
 
 - [RSyntaxTextArea](https://github.com/bobbylight/RSyntaxTextArea) for the coloring goodness and numbering
 - [Saxon](http://sourceforge.net/projects/saxon) updated to HE 9.5.1.3
-- 
 
 ##Disclaimer
 
