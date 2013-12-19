@@ -60,6 +60,7 @@ class XQuisitor {
         }
         
         try {
+
             QueryFrame frame = new QueryFrame();
             Runnable runner = new FrameDisplayer(frame);
             EventQueue.invokeLater(runner);

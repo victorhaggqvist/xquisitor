@@ -52,9 +52,10 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.plaf.synth.SynthConstants;
+
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
+
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
@@ -102,17 +103,15 @@ final class QueryFrame extends JFrame {
 
     private static int  preferredMetaKey;
     private static List openWindows = new LinkedList();
-    
-    //private JTextArea queryPane = new JTextArea();
 
     private RSyntaxTextArea queryArea = new RSyntaxTextArea();
     private RSyntaxTextArea outputArea = new RSyntaxTextArea();
 
-    //private JEditorPane outputPane = new JEditorPane();
     private JTextField contextField = new JTextField(24);
     private JTextField baseField = new JTextField(24);
     private JCheckBox doWrapping = new JCheckBox(Messages.getString("wrap")); 
-    private JCheckBox doIndenting = new JCheckBox(Messages.getString("prettyPrint")); 
+    private JCheckBox doIndenting = new JCheckBox(Messages.getString("prettyPrint"));
+    private JCheckBox enableLineComments = new JCheckBox(Messages.getString("lineComment"));
     private static Font display = new Font("Monospaced", Font.BOLD, 16); 
     private static Insets margin = new Insets(4, 3, 2, 4);
     private UndoManager manager = new UndoManager();
@@ -158,11 +157,8 @@ final class QueryFrame extends JFrame {
     }
 
     private void loadPreferences() {
-        System.out.println("load");
         contextField.setText(prefs.get(PRF_CONTEXT,""));
-        System.out.println(prefs.get(PRF_CONTEXT,""));
         baseField.setText(prefs.get(PRF_BASEURI,getUserDir()));
-        System.out.println("load");
     }
 
 
@@ -175,10 +171,6 @@ final class QueryFrame extends JFrame {
         queryArea.getDocument().addUndoableEditListener(manager);
         RTextScrollPane rTextScrollPane = new RTextScrollPane(queryArea);
 
-        //queryPane.setMargin(margin);
-        //queryPane.setFont(display);
-        //queryPane.getDocument().addUndoableEditListener(manager);
-        //JScrollPane queryScroll = new JScrollPane(queryPane);
         queryPanel.add(new JLabel(Messages.getString("Query_6")), BorderLayout.NORTH); 
         queryPanel.add(rTextScrollPane, BorderLayout.CENTER);
         queryPanel.add(makeOptionsPanel(), BorderLayout.EAST);
@@ -195,15 +187,7 @@ final class QueryFrame extends JFrame {
         outputArea.setCodeFoldingEnabled(true);
         outputArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_XML);
         outputArea.setTabSize(2);
-
-        //hack for no line cursor
         outputArea.setCurrentLineHighlightColor(Color.WHITE);
-        outputArea.addCaretListener(new CaretListener() {
-            @Override
-            public void caretUpdate(CaretEvent e) {
-                outputArea.setCurrentLineHighlightColor(Color.WHITE);
-            }
-        });
 
         RTextScrollPane rTextScrollPane = new RTextScrollPane(outputArea);
 
@@ -324,18 +308,28 @@ final class QueryFrame extends JFrame {
         GridBagConstraints doIndentingConstraints = new GridBagConstraints();
         doIndentingConstraints.gridx=3;
         doIndentingConstraints.gridy=3;
-        doIndentingConstraints.gridwidth=3;
+        doIndentingConstraints.gridwidth=2;
         doIndentingConstraints.gridheight=1;
         doWrappingConstraints.anchor = GridBagConstraints.WEST;
-        gbl.setConstraints(doIndenting, doIndentingConstraints); 
+        gbl.setConstraints(doIndenting, doIndentingConstraints);
+        doIndenting.setSelected(true);
         options.add(doIndenting);
+
+        GridBagConstraints enableLineCommentsConstraints = new GridBagConstraints();
+        enableLineCommentsConstraints.gridx=3;
+        enableLineCommentsConstraints.gridy=4;
+        enableLineCommentsConstraints.gridwidth=3;
+        enableLineCommentsConstraints.gridheight=1;
+        gbl.setConstraints(enableLineComments,enableLineCommentsConstraints);
+        enableLineComments.setSelected(true);
+        options.add(enableLineComments);
         
         // executeButton
         GridBagConstraints executeButtonConstraints = new GridBagConstraints();
         JButton executeButton = new JButton(Messages.getString("Run_Query_13")); 
         executeButton.addActionListener(new RunQuery());
         executeButtonConstraints.gridx=5;
-        executeButtonConstraints.gridy=4;
+        executeButtonConstraints.gridy=5;
         executeButtonConstraints.gridwidth=2;
         executeButtonConstraints.gridheight=1;
         executeButtonConstraints.anchor = GridBagConstraints.SOUTHEAST;
@@ -526,7 +520,7 @@ final class QueryFrame extends JFrame {
         menu.setMnemonic(KeyEvent.VK_Q);
 
         JMenuItem queryItem = new JMenuItem(Messages.getString("Run_Query_13")); 
-        queryItem.setMnemonic(KeyEvent.VK_R); 
+        queryItem.setMnemonic(KeyEvent.VK_R);
         queryItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, preferredMetaKey));
         queryItem.addActionListener(new RunQuery());
         menu.add(queryItem);
@@ -658,13 +652,16 @@ final class QueryFrame extends JFrame {
 
     private void performQuery(String query, String baseURI)
       throws XPathException, TransformerException, IOException {
-          
+
+        if (enableLineComments.isSelected())
+            query = parseLineComment(query);
+
         XQueryExpression exp = queryContext.compileQuery(query);
         
         if (null != baseURI && !"".equals(baseURI)) { 
             queryContext.setBaseURI(baseURI);   
         }
-        
+
         DynamicQueryContext result = new DynamicQueryContext(queryContext.getConfiguration());
         // set context
         String uri = contextField.getText().trim();
@@ -678,9 +675,20 @@ final class QueryFrame extends JFrame {
         queryResult = exp.iterator(result);
     }
 
+    /**
+     * Enabled line commenting with # as splitter
+     * @param query
+     * @return
+     */
     private String parseLineComment(String query){
+        String[] temp = query.split("\\n");
 
-        return "";
+        StringBuilder sb = new StringBuilder();
+        for (String line:temp){
+            sb.append(line.split("#")[0]+"\n");
+        }
+
+        return sb.toString();
     }
     
     private class QueryThread extends Thread {
@@ -714,21 +722,21 @@ final class QueryFrame extends JFrame {
                         outputArea.setText(result);
                     }
                 });
-             }
-             catch (IOException ex) {
+            }catch (IOException ex) {
                 hideProgressBar();
-                JOptionPane.showMessageDialog(QueryFrame.this, 
-                    ex.getMessage(), Messages.getString("Error_while_executing_query_43"), 
+                JOptionPane.showMessageDialog(QueryFrame.this,
+                    ex.getMessage(), Messages.getString("Error_while_executing_query_43"),
                     JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();   
-             } 
-             catch (TransformerException ex) {
+                ex.printStackTrace();
+            }catch (TransformerException ex) {
                 hideProgressBar();
-                JOptionPane.showMessageDialog(QueryFrame.this, 
-                    ex.getMessage(), Messages.getString("Error_while_executing_query_43"), 
+                String lineInfo = Messages.getString("Error_on_line")+" "+ex.getLocator().getLineNumber()+
+                        ((ex.getLocator().getColumnNumber()!=-1)?" "+Messages.getString("column")+" "+ex.getLocator().getColumnNumber():"");
+                JOptionPane.showMessageDialog(QueryFrame.this,lineInfo+"\n"+
+                    ex.getMessage(), Messages.getString("Error_while_executing_query_43"),
                     JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();   
-             } 
+                ex.printStackTrace();
+            }
 
         }
 
