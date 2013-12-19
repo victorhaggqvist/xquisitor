@@ -5,7 +5,7 @@ XQuisitor2 is based of [XQuisitor](http://www.cafeconleche.org/xquisitor/) and e
 
 #Download
 
-Get current version here
+Get current version [here](https://github.com/victorhaggqvist/xquisitor/archive/master.zip) then run the appropriate XQuisitor2 file.
 
 #New Freatures
 
