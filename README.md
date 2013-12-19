@@ -22,3 +22,6 @@ Get current version [here](https://github.com/victorhaggqvist/xquisitor/archive/
 ##Disclaimer
 
 XQuisitor2 is offered with out any warranty what so ever.
+
+##License
+GPLv2
