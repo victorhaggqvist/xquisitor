@@ -106,6 +106,7 @@ final class QueryFrame extends JFrame {
 
     private RSyntaxTextArea queryArea = new RSyntaxTextArea();
     private RSyntaxTextArea outputArea = new RSyntaxTextArea();
+    private RTextScrollPane rTextScrollPaneOutput;
 
     private JTextField contextField = new JTextField(24);
     private JTextField baseField = new JTextField(24);
@@ -118,7 +119,8 @@ final class QueryFrame extends JFrame {
     private JCheckBoxMenuItem wrapItem 
       = new JCheckBoxMenuItem(Messages.getString("wrap")); 
     private JCheckBoxMenuItem indentItem 
-      = new JCheckBoxMenuItem(Messages.getString("prettyPrint")); 
+      = new JCheckBoxMenuItem(Messages.getString("prettyPrint"));
+    private JCheckBoxMenuItem commentItem = new JCheckBoxMenuItem(Messages.getString("lineComment"));
         
     private File queryFile = null;
     private File contextFile;
@@ -189,9 +191,9 @@ final class QueryFrame extends JFrame {
         outputArea.setTabSize(2);
         outputArea.setCurrentLineHighlightColor(Color.WHITE);
 
-        RTextScrollPane rTextScrollPane = new RTextScrollPane(outputArea);
+        rTextScrollPaneOutput = new RTextScrollPane(outputArea);
 
-        outputPanel.add(rTextScrollPane, BorderLayout.CENTER);
+        outputPanel.add(rTextScrollPaneOutput, BorderLayout.CENTER);
         return outputPanel;
     }
 
@@ -547,7 +549,12 @@ final class QueryFrame extends JFrame {
         indentItem.setMnemonic(KeyEvent.VK_P); 
         indentItem.addActionListener(changer); 
         menu.add(indentItem);
-        
+
+        commentItem.setMnemonic(KeyEvent.VK_L);
+        commentItem.addActionListener(changer);
+
+        menu.add(commentItem);
+
         return menu;
     }
     
@@ -719,7 +726,11 @@ final class QueryFrame extends JFrame {
                 hideProgressBar();
                 SwingUtilities.invokeLater( new Runnable() {
                     public void run() {
+                        //rTextScrollPaneOutput.setAutoscrolls(false);
+
                         outputArea.setText(result);
+                        outputArea.setCaretPosition(1);
+                        //TODO scroll to top
                     }
                 });
             }catch (IOException ex) {
@@ -825,6 +836,7 @@ final class QueryFrame extends JFrame {
         public void itemStateChanged(ItemEvent evt) {
              wrapItem.setState(doWrapping.isSelected());
              indentItem.setState(doIndenting.isSelected());
+             commentItem.setSelected(enableLineComments.isSelected());
              startSerialize();
         }
 
@@ -854,9 +866,10 @@ final class QueryFrame extends JFrame {
         }
 
         public void actionPerformed(ActionEvent evt) {
-             doWrapping.setSelected(wrapItem.getState());
-             doIndenting.setSelected(indentItem.getState());
-             startSerialize();
+            doWrapping.setSelected(wrapItem.getState());
+            doIndenting.setSelected(indentItem.getState());
+            enableLineComments.setSelected(commentItem.getState());
+            startSerialize();
         }
         
     }
@@ -1158,6 +1171,7 @@ final class QueryFrame extends JFrame {
             System.out.println("Save stuff for next time");
         }
     }
+
 }
 
 
