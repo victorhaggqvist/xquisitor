@@ -1,4 +1,4 @@
-XQuisitor2
+XQuisitor2 [![Build Status](https://travis-ci.org/victorhaggqvist/xquisitor.svg?branch=dev)](https://travis-ci.org/victorhaggqvist/xquisitor)
 =========
 
 XQuisitor2 is based of [XQuisitor](http://www.cafeconleche.org/xquisitor/) and extended
