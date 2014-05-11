@@ -1,4 +1,5 @@
 //  Copyright 2003, 2004 Elliotte Rusty Harold
+//  Copyright 2013-2014 Victor Häggqvist
 //
 //  This file is part of XQuisitor.
 //
@@ -42,20 +43,19 @@ import javax.swing.UIManager;
  * 
  * @author Elliotte Rusty Harold
  * @version 1.0a5
+ *
+ * @author Victor Häggqvist
+ * @since 2013-12-18
+ * @version 2.0
  */
 class XQuisitor {
-    // write a shell script to launch it????
-
 
     public static void main(String[] args) {
-        
         initAppleProperties();
         
         try {
-            UIManager.setLookAndFeel(
-              UIManager.getSystemLookAndFeelClassName());
-        } 
-        catch (Exception ex) {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }catch (Exception ex) {
             // no big deal; just use Metal
         }
         
@@ -64,14 +64,12 @@ class XQuisitor {
             QueryFrame frame = new QueryFrame();
             Runnable runner = new FrameDisplayer(frame);
             EventQueue.invokeLater(runner);
-        }
-        catch (NoClassDefFoundError ex) {
+        }catch (NoClassDefFoundError ex) {
             if (ex.getMessage().indexOf("saxon") != -1) {
                 JOptionPane.showMessageDialog(null, 
                   "Saxon 8 is not in the CLASSPATH. (Try using -Xbootclasspath/p:)"
                 );
-            }
-            else {
+            }else {
                 ex.printStackTrace();
             }
             System.exit(1);

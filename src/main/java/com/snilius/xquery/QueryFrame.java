@@ -1,4 +1,5 @@
 //  Copyright 2003-2005 Elliotte Rusty Harold
+//  Copyright 2013-2014 Victor Häggqvist
 //
 //  This file is part of XQuisitor.
 //
@@ -84,6 +85,9 @@ import java.util.prefs.Preferences;
  * @author Elliotte Rusty Harold
  * @version 1.0a5
  *
+ * @author Victor Häggqvist
+ * @since 2013-12-18
+ * @version 2.0
  */
 final class QueryFrame extends JFrame {
 
@@ -928,8 +932,8 @@ final class QueryFrame extends JFrame {
     private class AboutListener implements ActionListener {
         
         public void actionPerformed(ActionEvent evt) {
-            JDialog dialog = new AboutDialog(QueryFrame.this);
-            dialog.show();
+            JFrame about = new AboutDialog();
+            about.show();
         }
 
     }

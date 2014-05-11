@@ -1,4 +1,5 @@
-//  Copyright 2003 Elliotte Rusty Harold
+//  Copyright 2004 Elliotte Rusty Harold
+//  Copyright 2013-2014 Victor Häggqvist
 //
 //  This file is part of XQuisitor.
 //
@@ -14,9 +15,11 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with XQuisitor; if not, write to the 
+//
 //  Free Software Foundation, Inc. 
 //  59 Temple Place, Suite 330
-//  Boston, MA  02111-1307  USA
+//  Boston, MA  02111-1307  
+//  USA
 //
 // In addition, as a special exception, Elliotte Rusty Harold gives
 // permission to link the code of this program with the Saxon-B library (or
@@ -29,22 +32,53 @@
 
 package com.snilius.xquery;
 
-import java.awt.Frame;
+import java.awt.Dialog;
+import java.awt.EventQueue;
+
+import com.apple.eawt.ApplicationAdapter;
+import com.apple.eawt.ApplicationEvent;
+import com.apple.eawt.Application;
+
+import javax.swing.*;
 
 /**
- * For an explanation of this class see John Zukowski's artile at
- * http://java.sun.com/developer/JDCTechTips/2003/tt1208.html
+ * @author Elliotte Rusty Harold
+ * @version 1.0a5
+ *
+ * @author Victor Häggqvist
+ * @since 2013-12-18
+ * @version 2.0
  */
-class FrameDisplayer implements Runnable {
+public class MacOSHandler extends Application {
+
+    private QueryFrame frame;
+    private JFrame about;
     
-    private final Frame frame;
+    // can I add a hiddenFrame of some kind to keep the 
+    // menu bar onscreen????
     
-    public FrameDisplayer(Frame frame) {
+    public MacOSHandler(QueryFrame frame) {
         this.frame = frame;
+        about = new AboutDialog();
+        addApplicationListener(new AboutBoxHandler());
     }
-    
-    public void run() {
-        frame.show();
+
+    class AboutBoxHandler extends ApplicationAdapter {
+        // what else can I handle here????
+        
+        public void handleAbout(ApplicationEvent event) {
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    about.show();
+                }
+            });
+            event.setHandled(true);
+        }
+        
+        public void handleQuit(ApplicationEvent event) {
+            frame.quit();
+        }
+        
     }
     
 }

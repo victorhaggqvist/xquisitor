@@ -1,5 +1,5 @@
 //  Copyright 2003 Elliotte Rusty Harold
-//
+//  Copyright 2013-2014 Victor Häggqvist
 //  This file is part of XQuisitor.
 //
 //  XQuisitor is free software; you can redistribute it and/or modify
@@ -16,6 +16,7 @@
 //  along with XQuisitor; if not, write to the 
 //  Free Software Foundation, Inc. 
 //  59 Temple Place, Suite 330
+//  Boston, MA  02111-1307  USA
 //
 // In addition, as a special exception, Elliotte Rusty Harold gives
 // permission to link the code of this program with the Saxon-B library (or
@@ -28,27 +29,22 @@
 
 package com.snilius.xquery;
 
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.awt.Frame;
 
 /**
- * @author Elliotte Rusty Harold
- * @version 1.0a5
+ * For an explanation of this class see John Zukowski's artile at
+ * http://java.sun.com/developer/JDCTechTips/2003/tt1208.html
  */
-class Messages {
-
-    private static final String BUNDLE_NAME = "com.snilius.xquery.QueryFrame";
-
-    private static final ResourceBundle RESOURCE_BUNDLE =
-        ResourceBundle.getBundle(BUNDLE_NAME);
-
-    private Messages() {}
+class FrameDisplayer implements Runnable {
     
-    public static String getString(String key) {
-        try {
-            return RESOURCE_BUNDLE.getString(key);
-        } catch (MissingResourceException e) {
-            return '!' + key + '!';
-        }
+    private final Frame frame;
+    
+    public FrameDisplayer(Frame frame) {
+        this.frame = frame;
     }
+    
+    public void run() {
+        frame.show();
+    }
+    
 }

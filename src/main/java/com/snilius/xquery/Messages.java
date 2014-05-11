@@ -1,4 +1,5 @@
-//  Copyright 2004 Elliotte Rusty Harold
+//  Copyright 2003 Elliotte Rusty Harold
+//  Copyright 2013-2014 Victor Häggqvist
 //
 //  This file is part of XQuisitor.
 //
@@ -14,11 +15,8 @@
 //
 //  You should have received a copy of the GNU General Public License
 //  along with XQuisitor; if not, write to the 
-//
 //  Free Software Foundation, Inc. 
 //  59 Temple Place, Suite 330
-//  Boston, MA  02111-1307  
-//  USA
 //
 // In addition, as a special exception, Elliotte Rusty Harold gives
 // permission to link the code of this program with the Saxon-B library (or
@@ -31,47 +29,31 @@
 
 package com.snilius.xquery;
 
-import java.awt.Dialog;
-import java.awt.EventQueue;
-
-import com.apple.eawt.ApplicationAdapter;
-import com.apple.eawt.ApplicationEvent;
-import com.apple.eawt.Application;
+import java.util.Locale;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 /**
  * @author Elliotte Rusty Harold
  * @version 1.0a5
+ *
+ * @author Victor Häggqvist
+ * @since 2013-12-18
+ * @version 2.0
  */
-public class MacOSHandler extends Application {
+class Messages {
 
-    private QueryFrame frame;
-    private Dialog about;
-    
-    // can I add a hiddenFrame of some kind to keep the 
-    // menu bar onscreen????
-    
-    public MacOSHandler(QueryFrame frame) {
-        this.frame = frame;
-        about = new AboutDialog(frame);
-        addApplicationListener(new AboutBoxHandler());
-    }
+    private static final String BUNDLE_NAME = "QueryFrame";
 
-    class AboutBoxHandler extends ApplicationAdapter {
-        // what else can I handle here????
-        
-        public void handleAbout(ApplicationEvent event) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    about.show();
-                }
-            });
-            event.setHandled(true);
-        }
-        
-        public void handleQuit(ApplicationEvent event) {
-            frame.quit();
-        }
-        
-    }
+    private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME,Locale.ENGLISH);
+
+    private Messages() { }
     
+    public static String getString(String key) {
+        try {
+            return RESOURCE_BUNDLE.getString(key);
+        } catch (MissingResourceException e) {
+            return '!' + key + '!';
+        }
+    }
 }
