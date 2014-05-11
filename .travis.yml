@@ -6,4 +6,3 @@ jdk:
   - openjdk6
   - openjdk7
 
-after_success: ./after_success.sh
